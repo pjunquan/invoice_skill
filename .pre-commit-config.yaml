@@ -1,0 +1,8 @@
+repos:
+  - repo: local
+    hooks:
+      - id: block-sensitive-paths
+        name: block-sensitive-paths
+        entry: python3 scripts/block_sensitive_paths.py
+        language: system
+        pass_filenames: false
