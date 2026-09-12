@@ -8,7 +8,8 @@
 - `output/`：生成的 PPT/PDF（默认不入库）。
 - `examples/`：脱敏示例数据，可用于冒烟测试。
 - `run.py`：一键入口。
-- `create_invoice_ppt.py`：核心逻辑。
+- `create_invoice_ppt.py`：一图一页版式。
+- `create_sheet_ppt.py`：A4 多图一页版式（按图片方向自动排布）。
 - `scripts/quick_validate.py`：`SKILL.md` 快速校验。
 - `scripts/block_sensitive_paths.py`：pre-commit 提交防呆。
 - `tests/`：pytest 自动化测试。
@@ -36,8 +37,39 @@ python3 run.py
 - `python3 run.py --pdf`：同时导出 PDF（需 LibreOffice / `soffice`）。
 - `python3 run.py --input-root <path>`：指定输入目录。
 - `python3 run.py --output-name <name>.pptx`：自定义输出文件名。
+- `python3 run.py --layout sheet`：A4 多图一页，并且**每个人单独出一册**。
+- `python3 run.py --layout sheet --captions <file>.csv`：给每张图加标注。
 
-运行时会自动做数量校验：`目标目录发票数` 必须等于 `生成PPT页数`，否则返回非 0 并报错。
+运行时会自动做数量校验：`single` 版式校验 `发票数 == 生成页数`，`sheet` 版式校验 `发票数 == 已贴图片数`，不符则返回非 0 并报错。
+
+## 两种版式
+
+| | `single`（默认） | `sheet` |
+|---|---|---|
+| 页面 | 10×7.5in | A4 |
+| 每页 | 1 张 | 竖版 6 张（3×2）／横版 2 张（上下） |
+| 标题 | 完整文件名 | 页眉 + 每图下方标注 |
+| 输出 | 全部人合成一个文件 | 每人一册 |
+
+`sheet` 的排布是**按宽高比自动决定**的，不用手工指定：
+
+- 竖版手机截图受限于高度，横排三列并不会让单张变小，所以排 3×2；
+- 横版发票受限于宽度，上下两张同样不会变小，所以排 1×2；
+- 夹在横版里的竖版图（例如几十行商品明细的超市发票）会**独占整页**，否则明细会糊掉。
+
+### 标注 CSV 格式
+
+第一列是文件名，其余列依次作为该图下方的标注行：
+
+```csv
+20260903_No06_34.30元_晚餐.png,No06　¥34.30,09-03　IP老师晚餐,真票1·商品餐费
+```
+
+### 单独调用版式引擎
+
+```bash
+python3 create_sheet_ppt.py <图片文件夹> --output out.pptx --captions captions.csv
+```
 
 ## 发布安全
 

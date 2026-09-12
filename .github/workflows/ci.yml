@@ -25,7 +25,7 @@ jobs:
         run: python scripts/quick_validate.py .
 
       - name: Syntax check
-        run: python -m py_compile run.py create_invoice_ppt.py scripts/quick_validate.py scripts/block_sensitive_paths.py
+        run: python -m py_compile run.py create_invoice_ppt.py create_sheet_ppt.py scripts/quick_validate.py scripts/block_sensitive_paths.py
 
       - name: Run tests
         run: pytest -q
